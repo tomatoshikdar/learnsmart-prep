@@ -13,6 +13,8 @@ import DashboardLayout from "./components/layout/DashboardLayout";
 // Student pages
 import StudentDashboard from "./pages/student/StudentDashboard";
 import QuestionBank from "./pages/student/QuestionBank";
+import QuestionListing from "./pages/student/QuestionListing";
+import SelfTest from "./pages/student/SelfTest";
 import ExamList from "./pages/student/ExamList";
 import TakeExam from "./pages/student/TakeExam";
 import ExamResult from "./pages/student/ExamResult";
@@ -59,6 +61,8 @@ const AppRoutes = () => (
 
     {/* Student */}
     <Route path="/questions" element={<ProtectedRoute><QuestionBank /></ProtectedRoute>} />
+    <Route path="/questions/:subjectId/:chapterId" element={<ProtectedRoute><QuestionListing /></ProtectedRoute>} />
+    <Route path="/self-test" element={<ProtectedRoute><SelfTest /></ProtectedRoute>} />
     <Route path="/exams" element={<ProtectedRoute><ExamList /></ProtectedRoute>} />
     <Route path="/exam/:examId" element={<ProtectedRoute><TakeExam /></ProtectedRoute>} />
     <Route path="/exam-result/:examId" element={<ProtectedRoute><ExamResult /></ProtectedRoute>} />

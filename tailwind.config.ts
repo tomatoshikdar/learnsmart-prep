@@ -16,6 +16,7 @@ export default {
       fontFamily: {
         sans: ["Inter", "sans-serif"],
         display: ["Plus Jakarta Sans", "sans-serif"],
+        bangla: ["Noto Sans Bengali", "sans-serif"],
       },
       colors: {
         border: "hsl(var(--border))",

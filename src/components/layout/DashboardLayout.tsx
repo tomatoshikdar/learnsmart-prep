@@ -4,7 +4,7 @@ import { useAuth } from "@/contexts/AuthContext";
 import {
   BookOpen, LayoutDashboard, FileText, ClipboardList, BarChart3,
   Trophy, Settings, LogOut, Menu, X, Users, PlusCircle, ChevronDown,
-  Shield, Bell
+  Shield, Bell, Target
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 
@@ -17,6 +17,7 @@ interface NavItem {
 const studentNav: NavItem[] = [
   { label: "Dashboard", href: "/dashboard", icon: <LayoutDashboard className="h-5 w-5" /> },
   { label: "Question Bank", href: "/questions", icon: <FileText className="h-5 w-5" /> },
+  { label: "Self Test", href: "/self-test", icon: <Target className="h-5 w-5" /> },
   { label: "Exams", href: "/exams", icon: <ClipboardList className="h-5 w-5" /> },
   { label: "My Results", href: "/results", icon: <BarChart3 className="h-5 w-5" /> },
   { label: "Leaderboard", href: "/leaderboard", icon: <Trophy className="h-5 w-5" /> },
