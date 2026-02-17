@@ -1,136 +1,147 @@
 import { useState } from "react";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { mockQuestions, subjects, chapters } from "@/data/mockData";
-import { Search, Filter, ChevronDown, CheckCircle, XCircle, Eye } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import { motion, AnimatePresence } from "framer-motion";
+import { subjectsData, subjectGroups, classOptions } from "@/data/questionBankData";
+import { ChevronDown, ChevronRight, BookOpen, FileText, Pencil } from "lucide-react";
 
 const QuestionBank = () => {
-  const [selectedSubject, setSelectedSubject] = useState("");
-  const [selectedChapter, setSelectedChapter] = useState("");
-  const [selectedDifficulty, setSelectedDifficulty] = useState("");
-  const [search, setSearch] = useState("");
-  const [expandedQ, setExpandedQ] = useState<string | null>(null);
-  const [answers, setAnswers] = useState<Record<string, string>>({});
-  const [submitted, setSubmitted] = useState<Record<string, boolean>>({});
+  const navigate = useNavigate();
+  const [selectedClass, setSelectedClass] = useState("hsc");
+  const [selectedGroup, setSelectedGroup] = useState("hsc-science");
+  const [expandedSubject, setExpandedSubject] = useState<string | null>(null);
 
-  const filtered = mockQuestions.filter((q) => {
-    if (selectedSubject && q.subject !== selectedSubject) return false;
-    if (selectedChapter && q.chapter !== selectedChapter) return false;
-    if (selectedDifficulty && q.difficulty !== selectedDifficulty) return false;
-    if (search && !q.questionText.toLowerCase().includes(search.toLowerCase())) return false;
-    return true;
-  });
-
-  const handleAnswer = (qId: string, opt: string) => {
-    if (submitted[qId]) return;
-    setAnswers({ ...answers, [qId]: opt });
+  const toggleSubject = (id: string) => {
+    setExpandedSubject(expandedSubject === id ? null : id);
   };
 
-  const handleSubmit = (qId: string) => {
-    setSubmitted({ ...submitted, [qId]: true });
+  const handleChapterClick = (subjectId: string, chapterId: string) => {
+    navigate(`/questions/${subjectId}/${chapterId}`);
   };
-
-  const diffColors = { Easy: "bg-success/10 text-success", Medium: "bg-warning/10 text-warning", Hard: "bg-destructive/10 text-destructive" };
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-display font-bold">Question Bank</h1>
-        <p className="text-muted-foreground mt-1">Practice questions by subject, chapter, and difficulty</p>
+    <div className="space-y-6 font-bangla">
+      {/* Blue gradient announcement banner */}
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-500 p-6 md:p-8">
+        <div className="absolute left-4 top-1/2 -translate-y-1/2 opacity-20 hidden md:block">
+          <div className="relative">
+            <FileText className="h-20 w-20 text-white" />
+            <Pencil className="h-8 w-8 text-white absolute -right-2 -bottom-1" />
+          </div>
+        </div>
+        <div className="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="text-center md:text-left md:ml-28">
+            <h1 className="text-2xl md:text-3xl font-bold text-white">
+              📚 প্রশ্নব্যাংক
+            </h1>
+            <p className="text-blue-100 mt-1 text-sm md:text-base">
+              বিষয়ভিত্তিক প্রশ্ন অনুশীলন করো এবং পরীক্ষায় ভালো ফলাফল করো
+            </p>
+          </div>
+          <button className="px-6 py-2.5 bg-white text-blue-600 font-semibold rounded-xl hover:bg-blue-50 transition-colors text-sm whitespace-nowrap shadow-lg">
+            প্রশ্নব্যাংক দেখুন
+          </button>
+        </div>
       </div>
 
       {/* Filters */}
-      <Card>
-        <CardContent className="p-4">
-          <div className="flex flex-wrap gap-3">
-            <div className="relative flex-1 min-w-[200px]">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input placeholder="Search questions..." className="pl-9" value={search} onChange={(e) => setSearch(e.target.value)} />
-            </div>
-            <select className="rounded-lg border border-input bg-background px-3 py-2 text-sm" value={selectedSubject} onChange={(e) => { setSelectedSubject(e.target.value); setSelectedChapter(""); }}>
-              <option value="">All Subjects</option>
-              {subjects.map((s) => <option key={s} value={s}>{s}</option>)}
-            </select>
-            <select className="rounded-lg border border-input bg-background px-3 py-2 text-sm" value={selectedChapter} onChange={(e) => setSelectedChapter(e.target.value)} disabled={!selectedSubject}>
-              <option value="">All Chapters</option>
-              {selectedSubject && chapters[selectedSubject]?.map((c) => <option key={c} value={c}>{c}</option>)}
-            </select>
-            <select className="rounded-lg border border-input bg-background px-3 py-2 text-sm" value={selectedDifficulty} onChange={(e) => setSelectedDifficulty(e.target.value)}>
-              <option value="">All Difficulties</option>
-              <option value="Easy">Easy</option>
-              <option value="Medium">Medium</option>
-              <option value="Hard">Hard</option>
-            </select>
-          </div>
-        </CardContent>
-      </Card>
+      <div className="flex flex-col sm:flex-row gap-3">
+        <select
+          value={selectedClass}
+          onChange={(e) => setSelectedClass(e.target.value)}
+          className="flex-1 rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-success/40"
+        >
+          {classOptions.map((c) => (
+            <option key={c.id} value={c.id}>{c.label}</option>
+          ))}
+        </select>
+        <select
+          value={selectedGroup}
+          onChange={(e) => setSelectedGroup(e.target.value)}
+          className="flex-1 rounded-xl border border-border bg-card px-4 py-2.5 text-sm font-medium text-foreground focus:outline-none focus:ring-2 focus:ring-success/40"
+        >
+          {subjectGroups.map((g) => (
+            <option key={g.id} value={g.id}>{g.label}</option>
+          ))}
+        </select>
+      </div>
 
-      <p className="text-sm text-muted-foreground">{filtered.length} questions found</p>
+      {/* Subject Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        {subjectsData.map((subject) => (
+          <motion.div
+            key={subject.id}
+            layout
+            className={`bg-card rounded-xl border-2 transition-all duration-300 shadow-sm hover:shadow-md ${
+              expandedSubject === subject.id
+                ? "border-success/50 shadow-md"
+                : "border-border hover:border-success/30"
+            }`}
+          >
+            {/* Subject Header */}
+            <button
+              onClick={() => toggleSubject(subject.id)}
+              className="w-full flex items-center gap-4 p-4 text-left"
+            >
+              <div className={`h-12 w-12 rounded-xl ${subject.bgColor} flex items-center justify-center text-2xl flex-shrink-0`}>
+                {subject.icon}
+              </div>
+              <div className="flex-1 min-w-0">
+                <div className="flex items-center gap-2">
+                  <h3 className="font-bold text-foreground text-base truncate">
+                    {subject.nameBn}
+                  </h3>
+                  {subject.isFree && (
+                    <span className="px-2 py-0.5 bg-destructive/10 text-destructive text-[10px] font-bold rounded-full whitespace-nowrap">
+                      ফ্রি
+                    </span>
+                  )}
+                </div>
+                <p className="text-xs text-muted-foreground mt-0.5">
+                  {subject.chapters.length}টি অধ্যায়
+                </p>
+              </div>
+              <motion.div
+                animate={{ rotate: expandedSubject === subject.id ? 180 : 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <ChevronDown className="h-5 w-5 text-muted-foreground" />
+              </motion.div>
+            </button>
 
-      {/* Questions */}
-      <div className="space-y-4">
-        {filtered.map((q, idx) => (
-          <Card key={q.id} className="overflow-hidden">
-            <CardContent className="p-5">
-              <div className="flex items-start justify-between gap-4">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2 mb-2">
-                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-primary/10 text-primary">{q.subject}</span>
-                    <span className="text-xs font-medium px-2 py-0.5 rounded-full bg-muted text-muted-foreground">{q.chapter}</span>
-                    <span className={`text-xs font-medium px-2 py-0.5 rounded-full ${diffColors[q.difficulty]}`}>{q.difficulty}</span>
+            {/* Expanded Chapter List */}
+            <AnimatePresence>
+              {expandedSubject === subject.id && (
+                <motion.div
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3, ease: "easeInOut" }}
+                  className="overflow-hidden"
+                >
+                  <div className="px-4 pb-4">
+                    <div className="border-t border-border pt-3 space-y-0.5">
+                      {subject.chapters.map((chapter) => (
+                        <button
+                          key={chapter.id}
+                          onClick={() => handleChapterClick(subject.id, chapter.id)}
+                          className="w-full flex items-center gap-3 px-3 py-2.5 rounded-lg text-left hover:bg-success/5 transition-colors group"
+                        >
+                          <BookOpen className="h-4 w-4 text-muted-foreground group-hover:text-success flex-shrink-0" />
+                          <span className="text-sm text-foreground group-hover:text-success flex-1 truncate">
+                            {chapter.nameBn}
+                          </span>
+                          <span className="text-[11px] text-muted-foreground whitespace-nowrap">
+                            {chapter.questionCount} টি
+                          </span>
+                          <ChevronRight className="h-3.5 w-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </button>
+                      ))}
+                    </div>
                   </div>
-                  <p className="font-medium text-foreground">Q{idx + 1}. {q.questionText}</p>
-                </div>
-                <span className="text-xs text-muted-foreground whitespace-nowrap">{q.marks} mark{q.marks > 1 ? "s" : ""}</span>
-              </div>
-
-              {q.options && (
-                <div className="mt-4 grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {q.options.map((opt, i) => {
-                    const isSelected = answers[q.id] === opt;
-                    const isCorrect = submitted[q.id] && opt === q.correctAnswer;
-                    const isWrong = submitted[q.id] && isSelected && opt !== q.correctAnswer;
-                    return (
-                      <button
-                        key={i}
-                        onClick={() => handleAnswer(q.id, opt)}
-                        className={`text-left p-3 rounded-lg border text-sm transition-all ${
-                          isCorrect ? "border-success bg-success/10 text-success" :
-                          isWrong ? "border-destructive bg-destructive/10 text-destructive" :
-                          isSelected ? "border-primary bg-primary/10 text-primary" :
-                          "border-border hover:border-primary/50 hover:bg-muted/50"
-                        }`}
-                      >
-                        <span className="font-medium mr-2">{String.fromCharCode(65 + i)}.</span>
-                        {opt}
-                        {isCorrect && <CheckCircle className="inline ml-2 h-4 w-4" />}
-                        {isWrong && <XCircle className="inline ml-2 h-4 w-4" />}
-                      </button>
-                    );
-                  })}
-                </div>
+                </motion.div>
               )}
-
-              <div className="mt-4 flex items-center gap-2">
-                {!submitted[q.id] && answers[q.id] && (
-                  <Button size="sm" onClick={() => handleSubmit(q.id)}>Check Answer</Button>
-                )}
-                {submitted[q.id] && (
-                  <Button size="sm" variant="ghost" onClick={() => setExpandedQ(expandedQ === q.id ? null : q.id)}>
-                    <Eye className="h-4 w-4 mr-1" /> {expandedQ === q.id ? "Hide" : "Show"} Explanation
-                  </Button>
-                )}
-              </div>
-
-              {expandedQ === q.id && submitted[q.id] && (
-                <div className="mt-3 p-3 rounded-lg bg-muted/50 text-sm text-muted-foreground">
-                  <p className="font-medium text-foreground mb-1">Explanation:</p>
-                  {q.explanation}
-                </div>
-              )}
-            </CardContent>
-          </Card>
+            </AnimatePresence>
+          </motion.div>
         ))}
       </div>
     </div>
